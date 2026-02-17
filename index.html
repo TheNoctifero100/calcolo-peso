@@ -1,0 +1,2213 @@
+<!doctype html>
+<html lang="it" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calcolo peso — Acciaitubi</title>
+  <style>
+    :root{
+      --brand:#0059ff;
+      --brand2:#2b7bff;
+
+      --bg:#07080c;
+      --panel:#0b0f1a;
+      --card:#0f1527;
+      --muted:#a7b0c0;
+      --text:#e9edf5;
+      --line:rgba(255,255,255,.08);
+      --shadow: 0 14px 40px rgba(0,0,0,.45);
+
+      --controlBg: rgba(0,0,0,.22);
+      --controlBg2: rgba(0,0,0,.34);
+      --controlBorder: rgba(255,255,255,.12);
+
+      --optionBg: #0f1527;
+      --optionText: #e9edf5;
+
+      --brandGlow: rgba(0,89,255,.22);
+      --radius: 18px;
+
+      --danger: rgba(255, 90, 90, .95);
+      --dangerBg: rgba(255, 90, 90, .12);
+
+      --ok: rgba(80, 220, 140, .95);
+      --okBg: rgba(80, 220, 140, .12);
+
+      /* Close icon color (theme-adaptive) */
+      --xColor: rgba(255,255,255,.92);
+
+      --ok: rgba(30, 150, 85, .95);
+      --okBg: rgba(30, 150, 85, .12);
+    }
+
+    html[data-theme="light"]{
+      --bg:#f6f7fb;
+      --panel:#ffffff;
+      --card:#ffffff;
+      --muted:#4c566a;
+      --text:#0d1220;
+      --line:rgba(0,0,0,.10);
+      --shadow: 0 14px 40px rgba(0,0,0,.12);
+
+      --controlBg: rgba(255,255,255,.92);
+      --controlBg2: rgba(245,247,252,.98);
+      --controlBorder: rgba(0,0,0,.12);
+
+      --optionBg: #ffffff;
+      --optionText: #0d1220;
+
+      --brandGlow: rgba(0,89,255,.16);
+
+      --xColor: rgba(13,18,32,.92);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1100px 650px at 18% 12%, var(--brandGlow), transparent 60%),
+        radial-gradient(900px 540px at 92% 20%, rgba(43,123,255,.12), transparent 58%),
+        radial-gradient(900px 600px at 50% 110%, rgba(0,89,255,.08), transparent 55%),
+        var(--bg);
+    }
+
+    .wrap{ max-width: 1100px; margin: 20px auto; padding: 0 18px 34px; transition: transform .22s ease; }
+
+    /* Content shift when drawer open */
+    body.drawerOpen .wrap{ transform: translateX(140px); }
+    @media (max-width: 920px){
+      body.drawerOpen .wrap{ transform: translateX(0); }
+    }
+
+    /* Top bar */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom: 14px;
+    }
+
+    .leftTop{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 280px;
+    }
+
+    .brandRow{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .logo{
+      height: 44px;
+      width:auto;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,.22));
+    }
+
+    h1{
+      margin:0;
+      font-size: 20px;
+      letter-spacing:.2px;
+      font-weight: 900;
+    }
+
+    .topActions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: color-mix(in oklab, var(--panel) 70%, transparent);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight: 900;
+      font-size: 13px;
+      transition: transform .12s ease, filter .12s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.06); }
+    .btn.primary{
+      background: linear-gradient(180deg, rgba(0,89,255,.40), rgba(0,89,255,.16));
+      border-color: rgba(0,89,255,.40);
+      box-shadow: 0 10px 24px rgba(0,89,255,.10);
+    }
+    .iconDot{
+      width: 10px; height: 10px; border-radius: 999px;
+      background: var(--brand);
+      box-shadow: 0 0 0 4px color-mix(in oklab, var(--brand) 18%, transparent);
+    }
+
+    /* Mode switch (3 segments) */
+    .seg3{
+      display:flex;
+      gap:8px;
+      padding: 6px;
+      border:1px solid var(--line);
+      border-radius: 14px;
+      background: color-mix(in oklab, var(--panel) 60%, transparent);
+    }
+    .seg3 button{
+      border:1px solid transparent;
+      background: transparent;
+      color: color-mix(in oklab, var(--text) 82%, transparent);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight: 900;
+      font-size: 13px;
+      transition: background .12s ease, border-color .12s ease, transform .12s ease;
+      white-space: nowrap;
+    }
+    .seg3 button:hover{ transform: translateY(-1px); }
+    .seg3 button.active{
+      background: color-mix(in oklab, var(--brand) 14%, transparent);
+      border-color: color-mix(in oklab, var(--brand) 40%, transparent);
+      color: var(--text);
+      box-shadow: 0 10px 22px rgba(0,89,255,.08);
+    }
+
+    /* Layout */
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 16px;
+      margin-top: 14px;
+    }
+    @media (max-width: 920px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.015));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position: relative;
+    }
+    html[data-theme="light"] .card{
+      background: linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.01));
+    }
+    .card:before{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(700px 220px at 22% 0%, rgba(0,89,255,.12), transparent 60%);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .card > *{ position: relative; }
+
+    .card .hd{
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+    }
+
+    .hdLeft{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+    .infoIcon{
+      width:26px; height:26px;
+      display:inline-flex;
+      align-items:center; justify-content:center;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: var(--controlBg);
+      color: var(--text);
+      cursor:pointer;
+      font-weight:800;
+      line-height:1;
+      user-select:none;
+    }
+    .infoIcon:hover{ border-color: rgba(255,255,255,.18); }
+    .infoIcon:active{ transform: translateY(1px); }
+    /* visibile solo in Recupero (JS) */
+    #datiInfoRecBtn{ display:none; }
+    #risInfoRecBtn{ display:none; }
+
+    .tolNote{
+      margin-left:10px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight:600;
+    }
+    .card .hd h2{
+      margin:0;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing:.15px;
+    }
+    .card .bd{ padding: 14px 16px; }
+
+    .miniTag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: color-mix(in oklab, var(--panel) 70%, transparent);
+      font-size: 12px;
+      white-space: nowrap;
+      color: color-mix(in oklab, var(--text) 80%, transparent);
+    }
+    .miniDot{
+      width: 8px; height: 8px; border-radius: 999px;
+      background: var(--brand);
+      box-shadow: 0 0 0 4px color-mix(in oklab, var(--brand) 18%, transparent);
+    }
+
+    /* Forms */
+    .form{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 560px){
+      .form{ grid-template-columns: 1fr; }
+    }
+
+    label{
+      display:block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: color-mix(in oklab, var(--text) 80%, transparent);
+    }
+
+    input, select{
+      width:100%;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--controlBorder);
+      background: linear-gradient(180deg, var(--controlBg2), var(--controlBg));
+      color: var(--text);
+      outline: none;
+    }
+    input::placeholder{ color: color-mix(in oklab, var(--text) 35%, transparent); }
+
+    input:focus, select:focus{
+      border-color: color-mix(in oklab, var(--brand) 70%, transparent);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand) 22%, transparent);
+    }
+
+    select option{
+      background: var(--optionBg);
+      color: var(--optionText);
+    }
+
+    .rowfull{ grid-column: 1 / -1; }
+
+    .seg{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      padding: 10px 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: color-mix(in oklab, var(--panel) 60%, transparent);
+    }
+    .pill{
+      display:flex; gap:8px; align-items:center;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: color-mix(in oklab, var(--panel) 70%, transparent);
+      cursor:pointer;
+      user-select:none;
+      font-size: 12px;
+      font-weight: 800;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+    .pill:hover{
+      transform: translateY(-1px);
+      border-color: color-mix(in oklab, var(--brand) 40%, transparent);
+      background: color-mix(in oklab, var(--brand) 10%, transparent);
+    }
+    .pill input{ width:auto; }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 12px;
+    }
+
+    /* Errors */
+    .err{
+      margin-top:6px;
+      font-size: 12px;
+      color: var(--danger);
+      display:none;
+    }
+    .hasError input, .hasError select{
+      border-color: color-mix(in oklab, var(--danger) 70%, transparent);
+      background: linear-gradient(180deg, color-mix(in oklab, var(--dangerBg) 55%, var(--controlBg2)), color-mix(in oklab, var(--dangerBg) 40%, var(--controlBg)));
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--danger) 18%, transparent);
+    }
+    .hasError .err{ display:block; }
+
+    /* Results */
+    .results{ display:grid; grid-template-columns: 1fr; gap: 10px; }
+    .kpi{
+      padding: 14px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: color-mix(in oklab, var(--panel) 70%, transparent);
+    }
+    .kpi .lbl{ color: var(--muted); font-size: 12px; font-weight: 800; }
+    .kpi .val{ font-size: 22px; font-weight: 950; margin-top: 4px; letter-spacing:.2px; }
+    .kpi .subv{ color: color-mix(in oklab, var(--text) 70%, transparent); font-size: 12px; margin-top: 6px; line-height: 1.35; }
+
+    /* Drawer (always stays open until user closes) */
+    .drawer{
+      position: fixed;
+      top:0; left:0;
+      height: 100vh;
+      width: 320px;
+      max-width: 90vw;
+      background: color-mix(in oklab, var(--panel) 92%, transparent);
+      border-right: 1px solid var(--line);
+      box-shadow: 16px 0 40px rgba(0,0,0,.30);
+      transform: translateX(-105%);
+      transition: transform .22s ease;
+      z-index: 70;
+      display:flex;
+      flex-direction: column;
+    }
+    .drawer.open{ transform: translateX(0); }
+
+    .drawerHeader{
+      padding: 14px 14px;
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      position: relative;
+    }
+    .drawerLogoWrap{
+      display:flex;
+      justify-content:flex-start;
+      align-items:center;
+      gap:10px;
+      pointer-events:none;
+    }
+    .drawerHeader .logo{
+      height: 40px;
+      filter:none;
+    }
+
+    .drawerHeaderActions{
+      position:absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      display:flex;
+      gap:8px;
+      align-items:center;
+      pointer-events:auto;
+    }
+
+    /* Better close button (theme adaptive) */
+    .squareBtn{
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: color-mix(in oklab, var(--panel) 70%, transparent);
+      cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition: transform .12s ease, filter .12s ease, border-color .12s ease;
+      color: var(--xColor);
+      font-weight: 950;
+      font-size: 18px;
+      line-height: 1;
+    }
+    .squareBtn:hover{
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+      border-color: color-mix(in oklab, var(--brand) 35%, transparent);
+    }
+
+    /* Theme button in drawer header */
+    .themeIconBtn{
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: color-mix(in oklab, var(--panel) 70%, transparent);
+      cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition: transform .12s ease, filter .12s ease, border-color .12s ease;
+    }
+    .themeIconBtn:hover{
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+      border-color: color-mix(in oklab, var(--brand) 35%, transparent);
+    }
+    .themeIconBtn svg{
+      width: 18px;
+      height: 18px;
+      stroke: var(--brand);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .drawerNav{
+      padding: 10px 10px 14px;
+      display:flex;
+      flex-direction: column;
+      gap:8px;
+    }
+    .navItem{
+      width: 100%;
+      text-align:left;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: color-mix(in oklab, var(--panel) 70%, transparent);
+      color: var(--text);
+      cursor:pointer;
+      font-weight: 900;
+    }
+    .navItem:hover{
+      border-color: color-mix(in oklab, var(--brand) 40%, transparent);
+      background: color-mix(in oklab, var(--brand) 8%, transparent);
+    }
+    .navItem small{ color: var(--muted); font-weight: 800; }
+    .drawerFoot{
+      margin-top:auto;
+      padding: 12px 14px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    
+    /* Recupero: tolleranza */
+    .tolBox{
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: color-mix(in oklab, var(--panel) 78%, transparent);
+    }
+    /* quando la tolBox è dentro il riquadro KPI, evita doppio bordo */
+    .tolBox.inside{
+      margin-top: 10px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+    .tolRow{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      align-items: baseline;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .tolRow b{ color: var(--text); }
+    .tolBar{
+      position: relative;
+      height: 14px;
+      border-radius: 999px;
+      background: color-mix(in oklab, var(--panel) 65%, transparent);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .tolBand{
+      position:absolute;
+      inset:0;
+      background: linear-gradient(90deg,
+        color-mix(in oklab, var(--danger) 30%, transparent) 0%,
+        color-mix(in oklab, var(--ok) 40%, transparent) 12%,
+        color-mix(in oklab, var(--ok) 40%, transparent) 88%,
+        color-mix(in oklab, var(--danger) 30%, transparent) 100%);
+      opacity: .9;
+    }
+    .tolMark{
+      position:absolute;
+      top: -2px;
+      width: 2px;
+      height: 18px;
+      background: color-mix(in oklab, var(--text) 70%, transparent);
+      opacity: .75;
+    }
+    .tolPointer{
+      position:absolute;
+      top: -4px;
+      width: 10px;
+      height: 22px;
+      border-radius: 8px;
+      transform: translateX(-50%);
+      background: var(--brand);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand) 25%, transparent);
+      border: 1px solid color-mix(in oklab, var(--brand) 60%, transparent);
+    }
+    .tolPointer.bad{
+      background: var(--danger);
+      box-shadow: 0 0 0 3px var(--dangerBg);
+      border-color: color-mix(in oklab, var(--danger) 65%, transparent);
+    }
+    .tolLegend{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 12px;
+      border: 1px solid var(--line);
+      background: color-mix(in oklab, var(--panel) 78%, transparent);
+      color: var(--text);
+      width: fit-content;
+    }
+    .badge.ok{
+      border-color: color-mix(in oklab, var(--ok) 55%, transparent);
+      background: var(--okBg);
+      color: var(--ok);
+    }
+    .badge.bad{
+      border-color: color-mix(in oklab, var(--danger) 55%, transparent);
+      background: var(--dangerBg);
+      color: var(--danger);
+    }
+    
+
+    /* Modal */
+    .modalOverlay{
+      position: fixed;
+      inset:0;
+      background: rgba(0,0,0,.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index: 90;
+    }
+    .modalOverlay.show{ display:flex; }
+
+    .modal{
+      width: min(760px, 96vw);
+      background: color-mix(in oklab, var(--panel) 94%, transparent);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position: relative;
+    }
+    .modal:before{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(700px 240px at 20% 0%, rgba(0,89,255,.14), transparent 60%);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .modal > *{ position: relative; }
+
+    .modalHd{
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .modalHd h3{ margin:0; font-size: 14px; font-weight: 950; }
+    .modalClose{
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: color-mix(in oklab, var(--panel) 70%, transparent);
+      cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-weight: 950;
+      font-size: 18px;
+      line-height: 1;
+      color: var(--xColor);
+      transition: transform .12s ease, filter .12s ease, border-color .12s ease;
+    }
+    .modalClose:hover{
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+      border-color: color-mix(in oklab, var(--brand) 35%, transparent);
+    }
+
+    .modalBd{ padding: 14px 16px; }
+    .modalActions{
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    table{
+      width:100%;
+      border-collapse: collapse;
+      margin-top:10px;
+      font-size: 12px;
+    }
+    th, td{
+      border-bottom: 1px solid var(--line);
+      padding: 8px 6px;
+      text-align:left;
+      vertical-align:top;
+    }
+    th{ color: var(--muted); font-weight:950; }
+    .right{ text-align:right; }
+
+    .hint{
+      color: var(--muted);
+      font-size: 12px;
+      line-height:1.45;
+    }
+
+    .muted{ color: var(--muted); }
+
+    .modePane{ display:none; }
+    .modePane.active{ display:block; }
+  </style>
+</head>
+
+<body>
+  <!-- Drawer (NO overlay close: stays open until X) -->
+  <aside class="drawer" id="drawer">
+    <div class="drawerHeader">
+      <div class="drawerLogoWrap">
+        <img class="logo" alt="Acciaitubi" src="logo-acciaitubi-it.png" />
+      </div>
+
+      <div class="drawerHeaderActions">
+        <!-- Theme toggle (direct) -->
+        <button class="themeIconBtn" id="themeToggleBtn" type="button" aria-label="Cambia tema">
+          <!-- Icon swapped by JS -->
+          <span id="themeIconSlot"></span>
+        </button>
+
+        <!-- Close -->
+        <button class="squareBtn" id="drawerClose" type="button" aria-label="Chiudi menu">✕</button>
+      </div>
+    </div>
+
+    <div class="drawerNav">
+      <button class="navItem" type="button" data-open="settings">
+        Impostazioni
+        <small>densità & spessori</small>
+      </button>
+
+      <button class="navItem" type="button" data-open="diameters">
+        Gestione diametri
+        <small>pollici + mm</small>
+      </button>
+
+      <button class="navItem" type="button" data-open="info">
+        Info
+        <small>formule & crediti</small>
+      </button>
+    </div>
+</aside>
+
+  <!-- Modal -->
+  <div class="modalOverlay" id="modalOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalHd">
+        <h3 id="modalTitle">—</h3>
+        <button class="modalClose" id="modalClose" type="button" aria-label="Chiudi finestra">✕</button>
+      </div>
+      <div class="modalBd" id="modalBody"></div>
+      <div class="modalActions" id="modalActions"></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="topbar">
+      <!-- MENU BUTTON LEFT -->
+      <div class="leftTop">
+        <button class="btn" id="menuBtn" type="button">
+          <span class="iconDot"></span>
+          Menu
+        </button>
+
+        <div class="brandRow">
+          <img class="logo" alt="Acciaitubi" src="logo-acciaitubi-it.png" />
+          <h1 id="pageTitle">Calcolo peso</h1>
+        </div>
+      </div>
+
+      <div class="topActions">
+        <div class="seg3" role="tablist" aria-label="Modalità calcolo">
+          <button id="tabPeso" class="active" type="button" data-mode="peso" role="tab">Peso</button>
+          <button id="tabSpessore" type="button" data-mode="spessore" role="tab">Spessore da peso</button>
+          <button id="tabRecupero" type="button" data-mode="recupero" role="tab">Recupero</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- INPUT -->
+      <section class="card">
+        <div class="hd">
+          <div class="hdLeft">
+            <h2>Dati</h2>
+            <button class="infoIcon" id="datiInfoRecBtn" type="button" aria-label="Info dati recupero" title="Info">i</button>
+          </div>
+        </div>
+
+        <div class="bd">
+          <!-- MODE: PESO -->
+          <div class="modePane active" id="panePeso">
+            <div class="form">
+              <div id="grpDiamP">
+                <label for="diamSelP">Diametro (pollici)</label>
+                <select id="diamSelP"></select>
+                <div class="err">Campo obbligatorio</div>
+              </div>
+
+              <div id="grpTP">
+                <label for="tP">Spessore t (mm)</label>
+                <input id="tP" type="text" inputmode="decimal" placeholder="es. 2,00" value="2,00" />
+                <div class="err">Campo obbligatorio</div>
+              </div>
+
+              <div id="grpLP">
+                <label for="lP">Lunghezza L (m)</label>
+                <input id="lP" type="text" inputmode="decimal" placeholder="es. 6,000" value="6,000" />
+                <div class="err">Campo obbligatorio</div>
+              </div>
+
+              <div id="grpQtyP">
+                <label for="qtyP">Numero barre (pz)</label>
+                <input id="qtyP" type="text" inputmode="numeric" value="1" />
+                <div class="err">Campo obbligatorio</div>
+              </div>
+
+              <div class="rowfull">
+                <label>Finitura</label>
+                <div class="seg">
+                  <label class="pill"><input type="checkbox" id="galvP"> Zincato</label>
+                  <label class="pill"><input type="checkbox" id="paintP"> Verniciato</label>
+                </div>
+              </div>
+
+              <div id="paintBoxP" style="display:none;">
+                <label for="paintTypeP">Tipo verniciatura</label>
+                <select id="paintTypeP">
+                  <option value="epoxy">Polvere epossidica</option>
+                  <option value="water">Ad acqua</option>
+                  <option value="primer">Primer</option>
+                  <option value="custom">Custom (spessore manuale)</option>
+                </select>
+              </div>
+
+              <div id="paintUmBoxP" style="display:none;">
+                <label for="paintUmP">Spessore vernice (µm) — esterno</label>
+                <input id="paintUmP" type="text" inputmode="decimal" value="107,4" />
+                <div class="err">Campo obbligatorio</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" id="calcPesoBtn" type="button">Calcola</button>
+              <button class="btn" id="resetPesoBtn" type="button">Reset</button>
+            </div>
+          </div>
+
+          <!-- MODE: SPESSORE DA PESO -->
+          <div class="modePane" id="paneSpessore">
+            <div class="form">
+              <div id="grpDiamS">
+                <label for="diamSelS">Diametro (pollici)</label>
+                <select id="diamSelS"></select>
+                <div class="err">Campo obbligatorio</div>
+              </div>
+
+              <div id="grpLS">
+                <label for="lS">Lunghezza L (m)</label>
+                <input id="lS" type="text" inputmode="decimal" placeholder="es. 6,000" value="6,000" />
+                <div class="err">Campo obbligatorio</div>
+              </div>
+
+              <div id="grpQtyS">
+                <label for="qtyS">Numero barre (pz)</label>
+                <input id="qtyS" type="text" inputmode="numeric" value="1" />
+                <div class="err">Campo obbligatorio</div>
+              </div>
+
+              <div id="grpWB">
+                <label for="wBundleIn">Peso fascio (kg)</label>
+                <input id="wBundleIn" type="text" inputmode="decimal" placeholder="es. 1250,0" />
+                <div class="err">Campo obbligatorio</div>
+              </div>
+
+              <div class="rowfull">
+                <label>Finitura</label>
+                <div class="seg">
+                  <label class="pill"><input type="checkbox" id="galvS"> Zincato</label>
+                  <label class="pill"><input type="checkbox" id="paintS"> Verniciato</label>
+                </div>
+              </div>
+
+              <div id="paintBoxS" style="display:none;">
+                <label for="paintTypeS">Tipo verniciatura</label>
+                <select id="paintTypeS">
+                  <option value="epoxy">Polvere epossidica</option>
+                  <option value="water">Ad acqua</option>
+                  <option value="primer">Primer</option>
+                  <option value="custom">Custom (spessore manuale)</option>
+                </select>
+              </div>
+
+              <div id="paintUmBoxS" style="display:none;">
+                <label for="paintUmS">Spessore vernice (µm) — esterno</label>
+                <input id="paintUmS" type="text" inputmode="decimal" value="107,4" />
+                <div class="err">Campo obbligatorio</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" id="calcSpBtn" type="button">Calcola spessore</button>
+              <button class="btn" id="resetSpBtn" type="button">Reset</button>
+            </div>
+
+            <div class="hint" style="margin-top:10px;">
+              Nota: lo spessore viene ricavato numericamente dal peso (considerando anche eventuali rivestimenti selezionati).
+            </div>
+          </div>
+
+          <!-- MODE: RECUPERO -->
+          <div class="modePane" id="paneRecupero">
+            <div class="form">
+<div class="rowfull">
+                <label>Metodo spessore reale</label>
+                <div class="seg">
+                  <label class="pill"><input type="checkbox" id="useMeasuredR"> Spessore misurato</label>
+                </div>
+              </div>
+
+              <div id="calcBoxR">
+                <div id="grpDiamR">
+                  <label for="diamSelR">Diametro (pollici)</label>
+                  <select id="diamSelR"></select>
+                  <div class="err">Campo obbligatorio</div>
+                </div>
+
+                <div id="grpLR">
+                  <label for="lR">Lunghezza L (m)</label>
+                  <input id="lR" type="text" inputmode="decimal" placeholder="es. 6,000" value="6,000" />
+                  <div class="err">Campo obbligatorio</div>
+                </div>
+
+                <div id="grpQtyR">
+                  <label for="qtyR">Numero barre (pz)</label>
+                  <input id="qtyR" type="text" inputmode="numeric" value="1" />
+                  <div class="err">Campo obbligatorio</div>
+                </div>
+
+                <div id="grpWBR">
+                  <label for="wBundleR">Peso fascio (kg)</label>
+                  <input id="wBundleR" type="text" inputmode="decimal" placeholder="es. 325,000" />
+                  <div class="err">Campo obbligatorio</div>
+                </div>
+
+                <div class="rowfull">
+                  <label>Finitura</label>
+                  <div class="seg">
+                    <label class="pill"><input type="checkbox" id="galvR"> Zincato</label>
+                    <label class="pill"><input type="checkbox" id="paintR"> Verniciato</label>
+                  </div>
+                </div>
+
+                <div id="paintBoxR" style="display:none;">
+                  <label for="paintTypeR">Tipo verniciatura</label>
+                  <select id="paintTypeR">
+                    <option value="epoxy">Polvere epossidica</option>
+                    <option value="water">Ad acqua</option>
+                    <option value="primer">Primer</option>
+                    <option value="custom">Custom (spessore manuale)</option>
+                  </select>
+                </div>
+
+                <div id="paintUmBoxR" style="display:none;">
+                  <label for="paintUmR">Spessore vernice (µm) — esterno</label>
+                  <input id="paintUmR" type="text" inputmode="decimal" value="107,4" />
+                  <div class="err">Campo obbligatorio</div>
+                </div>
+              </div>
+
+              <div id="measBoxR" style="display:none;">
+                <div id="grpTMeasR">
+                  <label for="tMeasR">Spessore misurato (mm)</label>
+                  <input id="tMeasR" type="text" inputmode="decimal" placeholder="es. 2,10" />
+                  <div class="err">Campo obbligatorio</div>
+                </div>
+              </div>
+
+              <div id="grpTNomR">
+                <label for="tNomR">Spessore nominale (mm)</label>
+                <input id="tNomR" type="text" inputmode="decimal" placeholder="es. 2,00" value="2,00" />
+                <div class="err">Campo obbligatorio</div>
+              </div>
+
+              <div class="actions">
+                <button class="btn primary" id="calcRecBtn" type="button">Calcola recupero</button>
+                <button class="btn" id="resetRecBtn" type="button">Reset</button>
+              </div>
+</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULTS -->
+      <section class="card">
+        <div class="hd">
+          <div class="hdLeft">
+            <h2>Risultati</h2>
+            <button class="infoIcon" id="risInfoRecBtn" type="button" aria-label="Info risultati recupero" title="Info">i</button>
+          </div>
+        </div>
+
+        <div class="bd">
+          <div id="resultsPeso" class="modePane active">
+            <div class="results">
+              <div class="kpi">
+                <div class="lbl">Peso 1 barra</div>
+                <div class="val" id="outWOne">— kg</div>
+                <div class="subv" id="outWOneSub">—</div>
+              </div>
+
+              <div class="kpi">
+                <div class="lbl">Peso fascio</div>
+                <div class="val" id="outWBundle">— kg</div>
+                <div class="subv" id="outWBundleSub">—</div>
+              </div>
+
+              <div class="kpi">
+                <div class="lbl">Peso lineare</div>
+                <div class="val" id="outWPerM">— kg/m</div>
+                <div class="subv" id="outWPerMSub">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="resultsSpessore" class="modePane">
+            <div class="results">
+              <div class="kpi">
+                <div class="lbl">Spessore teorico</div>
+                <div class="val" id="outT">— mm</div>
+                <div class="subv" id="outTSub">—</div>
+              </div>
+
+              <div class="kpi">
+                <div class="lbl">Peso 1 barra</div>
+                <div class="val" id="outWOneFromInput">— kg</div>
+                <div class="subv" id="outWOneFromInputSub">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="resultsRecupero" class="modePane">
+            <div class="results">
+              <div class="kpi">
+                <div class="lbl">Spessore reale</div>
+                <div class="val" id="outTR">— mm</div>
+                <div class="subv" id="outTRSub">—</div>
+              </div>
+
+              <div class="kpi">
+                <div class="lbl">Recupero</div>
+                <div class="val" id="outRecPerc">— %</div>
+                <div class="subv" id="outRecPercSub">—</div>
+              </div>
+
+              <div class="kpi">
+                <div class="lbl">Tolleranza</div>
+                <div class="val" id="outTolStatus">—</div>
+                <div class="subv" id="outTolStatusSub" style="display:none;">—</div>
+
+                <div class="tolBox inside">
+                  <div class="tolRow">
+                    <div>Min (−10%): <b id="outTolMin">—</b></div>
+                    <div>Nominale: <b id="outTolNom">—</b></div>
+                    <div>Max (+10%): <b id="outTolMax">—</b></div>
+                  </div>
+
+                  <div class="tolBar" id="tolBar">
+                    <div class="tolBand" aria-hidden="true"></div>
+                    <div class="tolMark" id="tolMarkMin" style="left:0%"></div>
+                    <div class="tolMark" id="tolMarkNom" style="left:50%"></div>
+                    <div class="tolMark" id="tolMarkMax" style="left:100%"></div>
+                    <div class="tolPointer" id="tolPointer" style="left:50%"></div>
+                  </div>
+
+                  <div class="tolLegend" id="tolLegend" style="display:none"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+<script>
+  const LS_DIAM = "acciaitubi_diameters_v3";
+  const LS_SETTINGS = "acciaitubi_settings_v3";
+  
+  const APP_VERSION = "v1.1";
+const LS_THEME = "acciaitubi_theme_v3";
+
+  const DEFAULT_DIAMETERS = [
+    { inch: '1/2"',   mm: 21.3 },
+    { inch: '3/4"',   mm: 26.9 },
+    { inch: '1"',     mm: 33.7 },
+    { inch: '1" 1/4', mm: 42.4 },
+    { inch: '1" 1/2', mm: 48.3 },
+    { inch: '2"',     mm: 60.3 },
+    { inch: '2" 1/2', mm: 76.1 },
+    { inch: '3"',     mm: 88.9 },
+    { inch: '4"',     mm: 114.3 },
+    { inch: '5"',     mm: 139.7 },
+    { inch: '6"',     mm: 168.3 },
+    { inch: '8"',     mm: 219.1 },
+  ];
+
+  const DEFAULT_SETTINGS = {
+    rhoSteel: 7850,
+    rhoZn: 7140,
+    rhoPaint: 1200,
+    galv_um: 44,
+    epoxy_um: 107.4,
+    water_um: 36.8,
+    primer_um: 26.6
+  };
+
+  function safeParseJSON(raw, fallback){
+    try{
+      const v = JSON.parse(raw);
+      return v ?? fallback;
+    }catch{
+      return fallback;
+    }
+  }
+
+  function loadDiameters(){
+    const raw = localStorage.getItem(LS_DIAM);
+    if(!raw) return structuredClone(DEFAULT_DIAMETERS);
+    const arr = safeParseJSON(raw, DEFAULT_DIAMETERS);
+    return (Array.isArray(arr) ? arr : DEFAULT_DIAMETERS)
+      .map(x => ({ inch: String(x.inch ?? "").trim(), mm: Number(x.mm) }))
+      .filter(x => x.inch && Number.isFinite(x.mm) && x.mm > 0)
+      .sort((a,b) => a.mm - b.mm);
+  }
+
+  function loadSettings(){
+    const raw = localStorage.getItem(LS_SETTINGS);
+    if(!raw) return structuredClone(DEFAULT_SETTINGS);
+    const s = safeParseJSON(raw, DEFAULT_SETTINGS);
+    return {
+      rhoSteel: Number(s.rhoSteel ?? DEFAULT_SETTINGS.rhoSteel),
+      rhoZn: Number(s.rhoZn ?? DEFAULT_SETTINGS.rhoZn),
+      rhoPaint: Number(s.rhoPaint ?? DEFAULT_SETTINGS.rhoPaint),
+      galv_um: Number(s.galv_um ?? DEFAULT_SETTINGS.galv_um),
+      epoxy_um: Number(s.epoxy_um ?? DEFAULT_SETTINGS.epoxy_um),
+      water_um: Number(s.water_um ?? DEFAULT_SETTINGS.water_um),
+      primer_um: Number(s.primer_um ?? DEFAULT_SETTINGS.primer_um),
+    };
+  }
+
+  function saveSettings(s){
+    localStorage.setItem(LS_SETTINGS, JSON.stringify(s));
+  }
+
+  let diameters = loadDiameters();
+  let settings = loadSettings();
+
+  /* ========= numeric helpers ========= */
+  function normalizeCommaInput(el){
+    el.addEventListener("input", () => {
+      el.value = el.value.replaceAll(".", ",");
+    });
+  }
+
+  function parseItNumber(str){
+    if(str == null) return NaN;
+    const s = String(str).trim();
+    if(!s) return NaN;
+    const cleaned = s.replace(/\s/g, "").replace(",", ".");
+    const v = Number(cleaned);
+    return Number.isFinite(v) ? v : NaN;
+  }
+
+  function fmtIt(x, n=3){
+    const v = Number(x);
+    if(!Number.isFinite(v)) return "—";
+    return v.toLocaleString("it-IT", { minimumFractionDigits: n, maximumFractionDigits: n });
+  }
+
+  function mmToM(x){ return x / 1000.0; }
+  function umToM(x){ return x / 1_000_000.0; }
+
+  function finituraLabel(galvOn, paintOn){
+    if(galvOn && paintOn) return "zincato-verniciato";
+    if(galvOn) return "zincato";
+    if(paintOn) return "verniciato";
+    return "nessuna";
+  }
+
+  /* ========= qty behavior ========= */
+  function setupQtyField(el){
+    el.addEventListener("focus", () => { if(el.value.trim() === "1") el.value = ""; });
+    el.addEventListener("blur", () => { if(!el.value.trim()) el.value = "1"; });
+  }
+
+  /* ========= validation ========= */
+  function setGroupError(groupEl, on){
+    if(!groupEl) return;
+    groupEl.classList.toggle("hasError", !!on);
+  }
+
+  function requireField(groupEl, inputEl, isNumeric=true){
+    const val = inputEl.value.trim();
+    if(!val){
+      setGroupError(groupEl, true);
+      return null;
+    }
+    if(!isNumeric){
+      setGroupError(groupEl, false);
+      return val;
+    }
+    const num = parseItNumber(val);
+    if(!Number.isFinite(num)){
+      setGroupError(groupEl, true);
+      return null;
+    }
+    setGroupError(groupEl, false);
+    return num;
+  }
+
+  /* ========= mode switch ========= */
+  const pageTitle = document.getElementById("pageTitle");
+  const tabs = Array.from(document.querySelectorAll(".seg3 button"));
+  const panes = {
+    peso: document.getElementById("panePeso"),
+    spessore: document.getElementById("paneSpessore"),
+    recupero: document.getElementById("paneRecupero")
+  };
+  const resPanes = {
+    peso: document.getElementById("resultsPeso"),
+    spessore: document.getElementById("resultsSpessore"),
+    recupero: document.getElementById("resultsRecupero")
+  };
+
+  function setMode(mode){
+    tabs.forEach(b => b.classList.toggle("active", b.dataset.mode === mode));
+    Object.entries(panes).forEach(([k, el]) => el.classList.toggle("active", k === mode));
+    Object.entries(resPanes).forEach(([k, el]) => el.classList.toggle("active", k === mode));
+
+    if(pageTitle){
+      if(mode === "peso") pageTitle.textContent = "Calcolo peso";
+      if(mode === "spessore") pageTitle.textContent = "Calcolo spessore";
+      if(mode === "recupero") pageTitle.textContent = "Calcolo recupero";
+    }
+    // Optional: keep browser tab title aligned
+    if(mode === "peso") document.title = "Calcolo peso — Acciaitubi";
+    if(mode === "spessore") document.title = "Calcolo spessore — Acciaitubi";
+    if(mode === "recupero") document.title = "Calcolo recupero — Acciaitubi";
+
+    // mostra l'icona info solo in Recupero
+    const infoBtn = document.getElementById("datiInfoRecBtn");
+    if(infoBtn) infoBtn.style.display = (mode === "recupero" ? "inline-flex" : "none");
+
+    const resInfoBtn = document.getElementById("risInfoRecBtn");
+    if(resInfoBtn) resInfoBtn.style.display = (mode === "recupero" ? "inline-flex" : "none");
+  }
+  tabs.forEach(b => b.addEventListener("click", () => setMode(b.dataset.mode)));
+  setMode("peso");
+
+  /* ========= drawer ========= */
+  const drawer = document.getElementById("drawer");
+  const menuBtn = document.getElementById("menuBtn");
+  const drawerClose = document.getElementById("drawerClose");
+
+  function openDrawer(){ drawer.classList.add("open"); document.body.classList.add("drawerOpen"); }
+  function closeDrawer(){ drawer.classList.remove("open"); document.body.classList.remove("drawerOpen"); }
+
+  menuBtn.addEventListener("click", openDrawer);
+  drawerClose.addEventListener("click", closeDrawer);
+
+  /* ========= modal ========= */
+  const modalOverlay = document.getElementById("modalOverlay");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalBody = document.getElementById("modalBody");
+  const modalActions = document.getElementById("modalActions");
+  const modalClose = document.getElementById("modalClose");
+
+  function openModal(title, bodyHtml, actionsHtml){
+    modalTitle.textContent = title;
+    modalBody.innerHTML = bodyHtml;
+    modalActions.innerHTML = actionsHtml || "";
+    modalOverlay.classList.add("show");
+    modalOverlay.setAttribute("aria-hidden", "false");
+  }
+  function closeModal(){
+    modalOverlay.classList.remove("show");
+    modalOverlay.setAttribute("aria-hidden", "true");
+    modalBody.innerHTML = "";
+    modalActions.innerHTML = "";
+  }
+  modalClose.addEventListener("click", closeModal);
+
+  /* ========= info dati Recupero ========= */
+  (function(){
+    const btn = document.getElementById("datiInfoRecBtn");
+    if(!btn) return;
+    btn.addEventListener("click", () => {
+      const body = `
+        <div class="hint">
+          Inserisci i dati del fascio per ricavare lo <b>spessore reale</b> dal peso e calcolare il <b>recupero %</b>.
+          In alternativa puoi attivare <b>Spessore misurato</b> e inserire direttamente la misurazione.
+        </div>
+      `;
+      const actions = `<button class="btn primary" type="button" id="m_ok">Chiudi</button>`;
+      openModal("Dati (Recupero)", body, actions);
+      const ok = document.getElementById("m_ok");
+      if(ok) ok.addEventListener("click", closeModal);
+    });
+  })();
+
+  /* ========= info risultati Recupero ========= */
+  (function(){
+    const btn = document.getElementById("risInfoRecBtn");
+    if(!btn) return;
+    btn.addEventListener("click", () => {
+      const body = `
+        <div class="hint">
+          <b>Spessore reale</b><br>
+          • Se <b>Spessore misurato</b> è attivo: uso direttamente il valore inserito.<br>
+          • Altrimenti: ricavo lo spessore dal <b>peso fascio</b> (peso 1 barra = peso fascio / n. barre) trovando il valore di t che rende il peso teorico uguale a quello inserito.<br>
+          Il peso teorico è calcolato come: <b>acciaio</b> + eventuale <b>zinco</b> (interno + esterno) + eventuale <b>vernice</b> (solo esterno), usando densità e spessori medi configurabili nelle impostazioni.<br><br>
+
+          <b>Recupero %</b><br>
+          Calcolo la differenza percentuale rispetto al nominale:<br>
+          <span style="opacity:.95">(tᵣ − tₙ) / tₙ × 100</span><br><br>
+
+          <b>Tolleranza</b><br>
+          min = nominale −10% ; max = nominale +10%.<br>
+          Il tubo è <b>in tolleranza</b> se tᵣ è compreso tra min e max (estremi inclusi).<br>
+          Nella barra, l'indicatore mostra la posizione di tᵣ all'interno del range.
+        </div>
+      `;
+      const actions = `<button class="btn primary" type="button" id="m_ok">Chiudi</button>`;
+      openModal("Risultati (Recupero)", body, actions);
+      const ok = document.getElementById("m_ok");
+      if(ok) ok.addEventListener("click", closeModal);
+    });
+  })();
+  modalOverlay.addEventListener("click", (e) => { if(e.target === modalOverlay) closeModal(); });
+
+  /* ========= drawer nav ========= */
+  document.querySelectorAll(".navItem").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.open;
+      if(key === "settings") showSettingsModal();
+      if(key === "diameters") showDiametersModal();
+      if(key === "info") showInfoModal();
+    });
+  });
+
+  /* ========= theme toggle (direct) ========= */
+  const themeToggleBtn = document.getElementById("themeToggleBtn");
+  const themeIconSlot = document.getElementById("themeIconSlot");
+
+  function sunIcon(){
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+      </svg>
+    `;
+  }
+  function moonIcon(){
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M21 12.8A8.5 8.5 0 0 1 11.2 3a7 7 0 1 0 9.8 9.8Z"></path>
+      </svg>
+    `;
+  }
+
+  function applyTheme(theme){
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem(LS_THEME, theme);
+    // icon: if dark => moon, if light => sun
+    themeIconSlot.innerHTML = (theme === "dark") ? moonIcon() : sunIcon();
+  }
+
+  themeToggleBtn.addEventListener("click", () => {
+    const now = document.documentElement.getAttribute("data-theme") || "dark";
+    applyTheme(now === "dark" ? "light" : "dark");
+  });
+
+  (function initTheme(){
+    const saved = localStorage.getItem(LS_THEME);
+    if(saved === "light" || saved === "dark") applyTheme(saved);
+    else applyTheme("dark");
+  })();
+
+  /* ========= diameter selects ========= */
+  const diamSelP = document.getElementById("diamSelP");
+  const diamSelS = document.getElementById("diamSelS");
+  const diamSelR = document.getElementById("diamSelR");
+  const selInfo = document.getElementById("selInfo");
+
+  function fillDiamSelect(sel){
+    sel.innerHTML = "";
+    diameters.forEach((d, i) => {
+      const opt = document.createElement("option");
+      opt.value = String(i);
+      opt.textContent = `${d.inch}  —  ${d.mm} mm`;
+      sel.appendChild(opt);
+    });
+    if(sel.options.length) sel.selectedIndex = 0;
+  }
+
+  function currentDiameter(sel){
+    const idx = Number(sel.value) || 0;
+    return diameters[idx];
+  }
+
+  function updateSelInfo(){
+    if(!selInfo) return;
+    const d = currentDiameter(diamSelP);
+    selInfo.textContent = d ? `${d.inch} (${d.mm} mm)` : "—";
+  }
+
+  diamSelP.addEventListener("change", updateSelInfo);
+
+  /* ========= paint preset ========= */
+  function paintPreset(type){
+    if(type === "epoxy") return settings.epoxy_um;
+    if(type === "water") return settings.water_um;
+    if(type === "primer") return settings.primer_um;
+    return null;
+  }
+
+  function setupPaintUI(paintChk, box, umBox, typeSel, umInput){
+    const toggle = () => {
+      const on = paintChk.checked;
+      box.style.display = on ? "block" : "none";
+      umBox.style.display = on ? "block" : "none";
+      if(on && typeSel.value !== "custom"){
+        const p = paintPreset(typeSel.value);
+        if(Number.isFinite(p)) umInput.value = String(p).replace(".", ",");
+      }
+    };
+
+    paintChk.addEventListener("change", toggle);
+    typeSel.addEventListener("change", () => {
+      if(typeSel.value !== "custom"){
+        const p = paintPreset(typeSel.value);
+        if(Number.isFinite(p)) umInput.value = String(p).replace(".", ",");
+      }
+      toggle();
+    });
+
+    toggle();
+  }
+
+  /* ========= WEIGHT MODE ========= */
+  const tP = document.getElementById("tP");
+  const lP = document.getElementById("lP");
+  const qtyP = document.getElementById("qtyP");
+  const galvP = document.getElementById("galvP");
+  const paintP = document.getElementById("paintP");
+  const paintBoxP = document.getElementById("paintBoxP");
+  const paintUmBoxP = document.getElementById("paintUmBoxP");
+  const paintTypeP = document.getElementById("paintTypeP");
+  const paintUmP = document.getElementById("paintUmP");
+
+  const grpDiamP = document.getElementById("grpDiamP");
+  const grpTP = document.getElementById("grpTP");
+  const grpLP = document.getElementById("grpLP");
+  const grpQtyP = document.getElementById("grpQtyP");
+
+  const outWOne = document.getElementById("outWOne");
+  const outWBundle = document.getElementById("outWBundle");
+  const outWPerM = document.getElementById("outWPerM");
+  const outWOneSub = document.getElementById("outWOneSub");
+  const outWBundleSub = document.getElementById("outWBundleSub");
+  const outWPerMSub = document.getElementById("outWPerMSub");
+
+  function calcWeights({Dmm, tmm, Lm, qty, galvOn, paintOn, paintUm}){
+    const D = mmToM(Dmm);
+    const t = mmToM(tmm);
+
+    const Asteel = (Math.PI / 4) * (D*D - Math.pow(D - 2*t, 2));
+    const Vsteel = Asteel * Lm;
+    const Wsteel = Vsteel * settings.rhoSteel;
+
+    const Dext = D;
+    const Dint = D - 2*t;
+    const Aext = Math.PI * Dext * Lm;
+    const Aint = Math.PI * Dint * Lm;
+
+    let Wzn = 0, Wp = 0;
+
+    if(galvOn){
+      const thZn = umToM(settings.galv_um);
+      Wzn = (Aext + Aint) * thZn * settings.rhoZn;
+    }
+    if(paintOn){
+      const thP = umToM(paintUm);
+      Wp = Aext * thP * settings.rhoPaint;
+    }
+
+    const Wone = Wsteel + Wzn + Wp;
+    const Wbundle = Wone * qty;
+    const Wperm = Wone / Lm;
+
+    return { Wone, Wbundle, Wperm };
+  }
+
+  function runPesoCalc(showAlerts=true){
+    const d = currentDiameter(diamSelP);
+    if(!d){
+      setGroupError(grpDiamP, true);
+      return;
+    }
+    setGroupError(grpDiamP, false);
+
+    const tmm = requireField(grpTP, tP, true);
+    const Lm = requireField(grpLP, lP, true);
+    const qtyVal = requireField(grpQtyP, qtyP, true);
+    if(tmm == null || Lm == null || qtyVal == null) return;
+
+    const qty = Math.max(1, Math.round(qtyVal));
+
+    if(tmm <= 0 || Lm <= 0){
+      if(showAlerts) alert("Spessore e lunghezza devono essere > 0.");
+      return;
+    }
+    if(tmm * 2 >= d.mm){
+      if(showAlerts) alert("Spessore troppo grande: deve valere 2t < D.");
+      return;
+    }
+
+    let paintUm = 0;
+    if(paintP.checked){
+      const v = parseItNumber(paintUmP.value);
+      if(!Number.isFinite(v)){
+        if(showAlerts) alert("Inserisci lo spessore vernice (µm).");
+        return;
+      }
+      paintUm = v;
+    }
+
+    const r = calcWeights({
+      Dmm: d.mm,
+      tmm,
+      Lm,
+      qty,
+      galvOn: galvP.checked,
+      paintOn: paintP.checked,
+      paintUm
+    });
+
+    outWOne.textContent = `${fmtIt(r.Wone,3)} kg`;
+    outWBundle.textContent = `${fmtIt(r.Wbundle,3)} kg`;
+    outWPerM.textContent = `${fmtIt(r.Wperm,3)} kg/m`;
+
+    outWOneSub.textContent = "";
+outWBundleSub.textContent = `Quantità: ${qty} barre`;
+    outWPerMSub.textContent = `Finitura: ${finituraLabel(galvP.checked, paintP.checked)}`;
+qtyP.value = String(qty);
+    updateSelInfo();
+  }
+
+  /* ========= THICKNESS MODE ========= */
+  const lS = document.getElementById("lS");
+  const qtyS = document.getElementById("qtyS");
+  const wBundleIn = document.getElementById("wBundleIn");
+
+  const galvS = document.getElementById("galvS");
+  const paintS = document.getElementById("paintS");
+  const paintBoxS = document.getElementById("paintBoxS");
+  const paintUmBoxS = document.getElementById("paintUmBoxS");
+  const paintTypeS = document.getElementById("paintTypeS");
+  const paintUmS = document.getElementById("paintUmS");
+
+  const grpDiamS = document.getElementById("grpDiamS");
+  const grpLS = document.getElementById("grpLS");
+  const grpQtyS = document.getElementById("grpQtyS");
+  const grpWB = document.getElementById("grpWB");
+
+  const outT = document.getElementById("outT");
+  const outTSub = document.getElementById("outTSub");
+  const outWOneFromInput = document.getElementById("outWOneFromInput");
+  const outWOneFromInputSub = document.getElementById("outWOneFromInputSub");
+
+  function weightPerBarGivenT({Dmm, tmm, Lm, galvOn, paintOn, paintUm}){
+    const r = calcWeights({ Dmm, tmm, Lm, qty: 1, galvOn, paintOn, paintUm });
+    return r.Wone;
+  }
+
+  function solveThicknessByBisection({Dmm, Lm, targetWone, galvOn, paintOn, paintUm}){
+    let lo = 0.05;
+    let hi = (Dmm / 2) - 0.05;
+    if(hi <= lo) return null;
+
+    const f = (t) => weightPerBarGivenT({Dmm, tmm:t, Lm, galvOn, paintOn, paintUm}) - targetWone;
+
+    const flo = f(lo);
+    const fhi = f(hi);
+
+    if(!(Number.isFinite(flo) && Number.isFinite(fhi))) return null;
+    if(flo > 0) return null;
+    if(fhi < 0) return null;
+
+    for(let i=0;i<80;i++){
+      const mid = (lo + hi)/2;
+      const fmid = f(mid);
+      if(!Number.isFinite(fmid)) return null;
+      if(Math.abs(fmid) < 1e-6) return mid;
+      if(fmid > 0) hi = mid;
+      else lo = mid;
+    }
+    return (lo + hi)/2;
+  }
+
+  function runSpessoreCalc(showAlerts=true){
+    const d = currentDiameter(diamSelS);
+    if(!d){
+      setGroupError(grpDiamS, true);
+      return;
+    }
+    setGroupError(grpDiamS, false);
+
+    const Lm = requireField(grpLS, lS, true);
+    const qtyVal = requireField(grpQtyS, qtyS, true);
+    const Wbundle = requireField(grpWB, wBundleIn, true);
+    if(Lm == null || qtyVal == null || Wbundle == null) return;
+
+    const qty = Math.max(1, Math.round(qtyVal));
+    if(Lm <= 0 || Wbundle <= 0){
+      if(showAlerts) alert("Lunghezza e peso fascio devono essere > 0.");
+      return;
+    }
+
+    let paintUm = 0;
+    if(paintS.checked){
+      const v = parseItNumber(paintUmS.value);
+      if(!Number.isFinite(v)){
+        if(showAlerts) alert("Inserisci lo spessore vernice (µm).");
+        return;
+      }
+      paintUm = v;
+    }
+
+    const targetWone = Wbundle / qty;
+
+    const tSolved = solveThicknessByBisection({
+      Dmm: d.mm, Lm, targetWone,
+      galvOn: galvS.checked,
+      paintOn: paintS.checked,
+      paintUm
+    });
+
+    if(tSolved == null){
+      if(showAlerts) alert("Impossibile ricavare lo spessore con questi dati (peso fuori range o parametri incoerenti).");
+      return;
+    }
+
+    outT.textContent = `${fmtIt(tSolved,2)} mm`;
+    outTSub.textContent = "";
+outWOneFromInput.textContent = `${fmtIt(targetWone,3)} kg`;
+    outWOneFromInputSub.textContent = "";
+qtyS.value = String(qty);
+  }
+
+
+  /* ========= RECUPERO MODE ========= */
+  const useMeasuredR = document.getElementById("useMeasuredR");
+  const calcBoxR = document.getElementById("calcBoxR");
+  const measBoxR = document.getElementById("measBoxR");
+
+  const lR = document.getElementById("lR");
+  const qtyR = document.getElementById("qtyR");
+  const wBundleR = document.getElementById("wBundleR");
+  const tNomR = document.getElementById("tNomR");
+  const tMeasR = document.getElementById("tMeasR");
+
+  // Finitura (solo se ricavo lo spessore dal peso)
+  const galvR = document.getElementById("galvR");
+  const paintR = document.getElementById("paintR");
+  const paintBoxR = document.getElementById("paintBoxR");
+  const paintUmBoxR = document.getElementById("paintUmBoxR");
+  const paintTypeR = document.getElementById("paintTypeR");
+  const paintUmR = document.getElementById("paintUmR");
+
+  const grpDiamR = document.getElementById("grpDiamR");
+  const grpLR = document.getElementById("grpLR");
+  const grpQtyR = document.getElementById("grpQtyR");
+  const grpWBR = document.getElementById("grpWBR");
+  const grpTNomR = document.getElementById("grpTNomR");
+  const grpTMeasR = document.getElementById("grpTMeasR");
+
+  const outTR = document.getElementById("outTR");
+  const outTRSub = document.getElementById("outTRSub");
+  const outRecPerc = document.getElementById("outRecPerc");
+  const outRecPercSub = document.getElementById("outRecPercSub");
+  const outTolStatus = document.getElementById("outTolStatus");
+  const outTolStatusSub = document.getElementById("outTolStatusSub");
+
+  const outTolMin = document.getElementById("outTolMin");
+  const outTolNom = document.getElementById("outTolNom");
+  const outTolMax = document.getElementById("outTolMax");
+  const tolPointer = document.getElementById("tolPointer");
+  const tolLegend = document.getElementById("tolLegend");
+
+  const calcRecBtn = document.getElementById("calcRecBtn");
+  const resetRecBtn = document.getElementById("resetRecBtn");
+
+  function toggleRecMode(){
+    const measured = !!(useMeasuredR && useMeasuredR.checked);
+    if(calcBoxR) calcBoxR.style.display = measured ? "none" : "";
+    if(measBoxR) measBoxR.style.display = measured ? "" : "none";
+
+    // clear errors on hidden blocks
+    if(measured){
+      if(grpDiamR) setGroupError(grpDiamR, false);
+      if(grpLR) setGroupError(grpLR, false);
+      if(grpQtyR) setGroupError(grpQtyR, false);
+      if(grpWBR) setGroupError(grpWBR, false);
+    }else{
+      if(grpTMeasR) setGroupError(grpTMeasR, false);
+    }
+  }
+
+  function clamp(x, lo, hi){ return Math.max(lo, Math.min(hi, x)); }
+
+  function setTolStatus(isOk){
+    if(!outTolStatus) return;
+    const clsOk = "badge ok";
+    const clsBad = "badge bad";
+    if(isOk == null){
+      outTolStatus.innerHTML = "—";
+      outTolStatus.className = "val";
+      return;
+    }
+    const label = isOk ? "IN TOLLERANZA" : "FUORI TOLLERANZA";
+    const cls = isOk ? clsOk : clsBad;
+    const note = isOk
+      ? "Lo spessore reale rientra nel range di tolleranza."
+      : "Lo spessore reale è fuori dal range di tolleranza.";
+    outTolStatus.innerHTML = `<span class="${cls}">${label}</span><span class="tolNote">${note} (±10% rispetto al nominale)</span>`;
+  }
+
+  function runRecuperoCalc(showAlerts=true){
+    const tNom = requireField(grpTNomR, tNomR, true);
+    if(tNom == null) return;
+    if(tNom <= 0){
+      if(showAlerts) alert("Lo spessore nominale deve essere > 0.");
+      return;
+    }
+
+    const minT = tNom * 0.90;
+    const maxT = tNom * 1.10;
+
+    let tReal = null;
+    const useMeasured = !!(useMeasuredR && useMeasuredR.checked);
+
+    if(useMeasured){
+      tReal = requireField(grpTMeasR, tMeasR, true);
+      if(tReal == null) return;
+      if(tReal <= 0){
+        if(showAlerts) alert("Lo spessore misurato deve essere > 0.");
+        return;
+      }
+      if(outTRSub) outTRSub.textContent = "Da misurazione inserita";
+    }else{
+      const d = currentDiameter(diamSelR);
+      if(!d){
+        setGroupError(grpDiamR, true);
+        return;
+      }
+      setGroupError(grpDiamR, false);
+
+      const Lm = requireField(grpLR, lR, true);
+      const qtyVal = requireField(grpQtyR, qtyR, true);
+      const Wbundle = requireField(grpWBR, wBundleR, true);
+      if(Lm == null || qtyVal == null || Wbundle == null) return;
+
+      const qty = Math.max(1, Math.round(qtyVal));
+      if(Lm <= 0 || Wbundle <= 0){
+        if(showAlerts) alert("Lunghezza e peso fascio devono essere > 0.");
+        return;
+      }
+      const targetWone = Wbundle / qty;
+
+      let paintUm = 0;
+      if(paintR && paintR.checked){
+        const v = parseItNumber(paintUmR ? paintUmR.value : "");
+        if(!Number.isFinite(v)){
+          if(showAlerts) alert("Inserisci lo spessore vernice (µm).");
+          return;
+        }
+        paintUm = v;
+      }
+
+      // Ricavo t numericamente (acciaio + eventuali rivestimenti)
+      const tSolved = solveThicknessByBisection({
+        Dmm: d.mm, Lm, targetWone,
+        galvOn: !!(galvR && galvR.checked),
+        paintOn: !!(paintR && paintR.checked),
+        paintUm
+      });
+
+      if(tSolved == null){
+        if(showAlerts) alert("Impossibile ricavare lo spessore con questi dati (peso fuori range o parametri incoerenti).");
+        return;
+      }
+
+      tReal = tSolved;
+      const fin = finituraLabel(!!(galvR && galvR.checked), !!(paintR && paintR.checked));
+      if(outTRSub) outTRSub.textContent = `Ricavato da peso (peso 1 barra: ${fmtIt(targetWone,3)} kg; finitura: ${fin})`;
+      qtyR.value = String(qty);
+    }
+
+    // Outputs principali
+    if(outTR) outTR.textContent = `${fmtIt(tReal,2)} mm`;
+
+    const recPerc = ((tReal - tNom) / tNom) * 100;
+    if(outRecPerc) outRecPerc.textContent = `${fmtIt(recPerc,2)} %`;
+    if(outRecPercSub) outRecPercSub.textContent = `Differenza % rispetto al nominale`;
+
+    if(outTolMin) outTolMin.textContent = `${fmtIt(minT,2)} mm`;
+    if(outTolNom) outTolNom.textContent = `${fmtIt(tNom,2)} mm`;
+    if(outTolMax) outTolMax.textContent = `${fmtIt(maxT,2)} mm`;
+
+    const inTol = (tReal >= minT && tReal <= maxT);
+    setTolStatus(inTol);
+    if(outTolStatusSub){
+      outTolStatusSub.textContent = "";
+      outTolStatusSub.style.display = "none";
+    }
+
+    // Grafico: min=0%, max=100%, nominale=50%
+    if(tolPointer){
+      const pos = ((tReal - minT) / (maxT - minT)) * 100;
+      const posClamped = clamp(pos, 0, 100);
+      tolPointer.style.left = `${posClamped}%`;
+      tolPointer.classList.toggle("bad", !inTol);
+    }
+    if(tolLegend) tolLegend.textContent = "";
+  }
+
+  function resetRecupero(){
+    if(useMeasuredR) useMeasuredR.checked = false;
+    if(lR) lR.value = "6,000";
+    if(qtyR) qtyR.value = "1";
+    if(wBundleR) wBundleR.value = "";
+    if(tNomR) tNomR.value = "2,00";
+    if(tMeasR) tMeasR.value = "";
+
+    if(galvR) galvR.checked = false;
+    if(paintR) paintR.checked = false;
+    if(paintTypeR) paintTypeR.value = "epoxy";
+    if(paintUmR) paintUmR.value = String(settings.epoxy_um).replace(".", ",");
+
+    // aggiorna UI vernice (mostra/nascondi campi) senza toccare gli altri tab
+    if(paintTypeR) paintTypeR.dispatchEvent(new Event("change"));
+    if(paintR) paintR.dispatchEvent(new Event("change"));
+
+    [grpDiamR, grpLR, grpQtyR, grpWBR, grpTNomR, grpTMeasR].filter(Boolean).forEach(g => setGroupError(g, false));
+
+    if(outTR) outTR.textContent = "— mm";
+    if(outTRSub) outTRSub.textContent = "—";
+    if(outRecPerc) outRecPerc.textContent = "— %";
+    if(outRecPercSub) outRecPercSub.textContent = "—";
+    setTolStatus(null);
+    if(outTolStatusSub){ outTolStatusSub.textContent = ""; outTolStatusSub.style.display = "none"; }
+    if(outTolMin) outTolMin.textContent = "—";
+    if(outTolNom) outTolNom.textContent = "—";
+    if(outTolMax) outTolMax.textContent = "—";
+    if(tolPointer){
+      tolPointer.style.left = "50%";
+      tolPointer.classList.remove("bad");
+    }
+    if(tolLegend) tolLegend.textContent = "—";
+
+    toggleRecMode();
+  }
+
+
+  /* ========= modals ========= */
+  function showSettingsModal(){
+    const body = `
+      <div class="hint" style="margin-bottom:10px;">
+        Valori salvati localmente nel browser.
+      </div>
+
+      <div class="form">
+        <div>
+          <label>Densità acciaio (kg/m³)</label>
+          <input id="m_rhoSteel" type="text" inputmode="decimal" value="${String(settings.rhoSteel).replace(".", ",")}" />
+        </div>
+
+        <div>
+          <label>Densità zinco (kg/m³)</label>
+          <input id="m_rhoZn" type="text" inputmode="decimal" value="${String(settings.rhoZn).replace(".", ",")}" />
+        </div>
+
+        <div>
+          <label>Densità vernice (kg/m³)</label>
+          <input id="m_rhoPaint" type="text" inputmode="decimal" value="${String(settings.rhoPaint).replace(".", ",")}" />
+        </div>
+
+        <div>
+          <label>Spessore zinco medio (µm) — int+est</label>
+          <input id="m_galv" type="text" inputmode="decimal" value="${String(settings.galv_um).replace(".", ",")}" />
+        </div>
+
+        <div>
+          <label>Spessore medio epossidica (µm)</label>
+          <input id="m_epoxy" type="text" inputmode="decimal" value="${String(settings.epoxy_um).replace(".", ",")}" />
+        </div>
+
+        <div>
+          <label>Spessore medio ad acqua (µm)</label>
+          <input id="m_water" type="text" inputmode="decimal" value="${String(settings.water_um).replace(".", ",")}" />
+        </div>
+
+        <div>
+          <label>Spessore medio primer (µm)</label>
+          <input id="m_primer" type="text" inputmode="decimal" value="${String(settings.primer_um).replace(".", ",")}" />
+        </div>
+      </div>
+    `;
+
+    const actions = `
+      <button class="btn" type="button" id="m_cancel">Annulla</button>
+      <button class="btn primary" type="button" id="m_save">Salva impostazioni</button>
+    `;
+
+    openModal("Impostazioni", body, actions);
+
+    ["m_rhoSteel","m_rhoZn","m_rhoPaint","m_galv","m_epoxy","m_water","m_primer"].forEach(id => {
+      normalizeCommaInput(document.getElementById(id));
+    });
+
+    document.getElementById("m_cancel").addEventListener("click", closeModal);
+    document.getElementById("m_save").addEventListener("click", () => {
+      const rhoSteel = parseItNumber(document.getElementById("m_rhoSteel").value);
+      const rhoZn = parseItNumber(document.getElementById("m_rhoZn").value);
+      const rhoPaint = parseItNumber(document.getElementById("m_rhoPaint").value);
+      const galv = parseItNumber(document.getElementById("m_galv").value);
+      const epoxy = parseItNumber(document.getElementById("m_epoxy").value);
+      const water = parseItNumber(document.getElementById("m_water").value);
+      const primer = parseItNumber(document.getElementById("m_primer").value);
+
+      if(![rhoSteel,rhoZn,rhoPaint,galv,epoxy,water,primer].every(v => Number.isFinite(v) && v >= 0)){
+        alert("Controlla i valori: devono essere numerici e >= 0.");
+        return;
+      }
+
+      settings = { rhoSteel, rhoZn, rhoPaint, galv_um: galv, epoxy_um: epoxy, water_um: water, primer_um: primer };
+      saveSettings(settings);
+
+      if(paintTypeP.value !== "custom") paintUmP.value = String(paintPreset(paintTypeP.value)).replace(".", ",");
+      if(paintTypeS.value !== "custom") paintUmS.value = String(paintPreset(paintTypeS.value)).replace(".", ",");
+      if(paintTypeR && paintUmR && paintTypeR.value !== "custom") paintUmR.value = String(paintPreset(paintTypeR.value)).replace(".", ",");
+
+      closeModal();
+      runPesoCalc(false);
+      runSpessoreCalc(false);
+    });
+  }
+
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  }
+
+  function showDiametersModal(){
+    const rows = diameters.map((d, i) => `
+      <tr>
+        <td>${escapeHtml(d.inch)}</td>
+        <td class="right">${fmtIt(d.mm,1)}</td>
+        <td class="right"><button class="btn" style="padding:6px 10px;" type="button" data-del="${i}">Elimina</button></td>
+      </tr>
+    `).join("");
+
+    const body = `
+      <div class="hint">
+        Aggiungi diametri indicando <b>pollici (")</b> e <b>mm</b>. Poi premi <b>Salva</b>.
+      </div>
+
+      <div class="form" style="margin-top:10px;">
+        <div>
+          <label>Pollici (")</label>
+          <input id="m_inch" type="text" placeholder='es. 10" oppure 3" 1/2' />
+        </div>
+        <div>
+          <label>Diametro esterno (mm)</label>
+          <input id="m_mm" type="text" inputmode="decimal" placeholder="es. 273,0" />
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top:10px;">
+        <button class="btn" type="button" id="m_add">Aggiungi</button>
+        <button class="btn" type="button" id="m_resetDiam">Ripristina default</button>
+      </div>
+
+      <div class="hint" id="m_dStatus">Totale diametri: ${diameters.length}</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Pollici (")</th>
+            <th class="right">mm</th>
+            <th class="right">Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="m_dBody">${rows}</tbody>
+      </table>
+    `;
+
+    const actions = `
+      <button class="btn" type="button" id="m_cancel">Chiudi</button>
+      <button class="btn primary" type="button" id="m_save">Salva diametri</button>
+    `;
+
+    openModal("Gestione diametri", body, actions);
+
+    const mmEl = document.getElementById("m_mm");
+    normalizeCommaInput(mmEl);
+
+    function refreshModalTable(){
+      const bodyEl = document.getElementById("m_dBody");
+      bodyEl.innerHTML = diameters.map((d, i) => `
+        <tr>
+          <td>${escapeHtml(d.inch)}</td>
+          <td class="right">${fmtIt(d.mm,1)}</td>
+          <td class="right"><button class="btn" style="padding:6px 10px;" type="button" data-del="${i}">Elimina</button></td>
+        </tr>
+      `).join("");
+
+      document.getElementById("m_dStatus").textContent = `Totale diametri: ${diameters.length}`;
+
+      bodyEl.querySelectorAll("button[data-del]").forEach(b => {
+        b.addEventListener("click", () => {
+          const idx = Number(b.getAttribute("data-del"));
+          diameters.splice(idx, 1);
+          if(diameters.length === 0) diameters = structuredClone(DEFAULT_DIAMETERS);
+          refreshModalTable();
+        });
+      });
+    }
+
+    refreshModalTable();
+
+    document.getElementById("m_add").addEventListener("click", () => {
+      const inch = document.getElementById("m_inch").value.trim();
+      const mm = parseItNumber(document.getElementById("m_mm").value);
+      if(!inch){ alert('Inserisci i pollici (").'); return; }
+      if(!(Number.isFinite(mm) && mm > 0)){ alert("Inserisci mm validi (>0)."); return; }
+      const exists = diameters.some(d => Math.abs(d.mm - mm) < 0.001);
+      if(exists){ alert("Esiste già un diametro con questi mm."); return; }
+
+      diameters.push({ inch, mm });
+      diameters.sort((a,b) => a.mm - b.mm);
+      document.getElementById("m_inch").value = "";
+      document.getElementById("m_mm").value = "";
+      refreshModalTable();
+    });
+
+    document.getElementById("m_resetDiam").addEventListener("click", () => {
+      diameters = structuredClone(DEFAULT_DIAMETERS);
+      refreshModalTable();
+    });
+
+    document.getElementById("m_cancel").addEventListener("click", closeModal);
+    document.getElementById("m_save").addEventListener("click", () => {
+      localStorage.setItem(LS_DIAM, JSON.stringify(diameters));
+      fillDiamSelect(diamSelP);
+      fillDiamSelect(diamSelS);
+      if(diamSelR) fillDiamSelect(diamSelR);
+      updateSelInfo();
+      closeModal();
+      runPesoCalc(false);
+      runSpessoreCalc(false);
+    });
+  }
+
+  function showInfoModal(){
+    const body = `
+      <div class="hint">
+        <b>Acciaio</b><br>
+        Sezione anello: A = (π/4) · (D² − (D−2t)²) con D e t in metri.<br>
+        Volume: V = A · L. Peso: W = V · ρ.<br><br>
+
+        <b>Rivestimenti (approssimazione “a strato”)</b><br>
+        A<sub>ext</sub> = π · D · L; A<sub>int</sub> = π · (D−2t) · L.<br>
+        Peso rivestimento: W = Area · spessore · densità.<br><br>
+
+        <b>Spessori medi usati (misurazioni reali su tubi prodotti)</b><br>
+        • Zinco: <b>${String(settings.galv_um).replace(".", ",")} µm</b> (interno + esterno).<br>
+        • Epossidica: <b>${String(settings.epoxy_um).replace(".", ",")} µm</b> (solo esterno).<br>
+        • Ad acqua: <b>${String(settings.water_um).replace(".", ",")} µm</b> (solo esterno).<br>
+        • Primer: <b>${String(settings.primer_um).replace(".", ",")} µm</b> (solo esterno).<br><br>
+
+
+        <b>Recupero – tolleranza</b><br>
+        Tolleranza: min = nominale −10% ; max = nominale +10%. In tolleranza se lo spessore reale è compreso tra min e max.
+        <br><br>
+        <b>Crediti</b><br>
+        Sviluppato da <b>Marco Gerenzani</b> – Acciaitubi.
+        <br><b>Versione</b><br>
+        <span style=\"opacity:.9\">${APP_VERSION}</span>
+      </div>
+    `;
+    const actions = `<button class="btn primary" type="button" id="m_ok">Chiudi</button>`;
+    openModal("Info", body, actions);
+    document.getElementById("m_ok").addEventListener("click", closeModal);
+  }
+
+  /* ========= init ========= */
+  fillDiamSelect(diamSelP);
+  fillDiamSelect(diamSelS);
+  if(diamSelR) fillDiamSelect(diamSelR);
+  updateSelInfo();
+
+  // Decimal behavior: dot -> comma on these inputs
+  [tP, lP, paintUmP, lS, wBundleIn, paintUmS, lR, wBundleR, tNomR, tMeasR, paintUmR].filter(Boolean).forEach(normalizeCommaInput);
+
+  // Recupero: toggle metodo e bottoni
+  if(useMeasuredR) useMeasuredR.addEventListener("change", toggleRecMode);
+  if(calcRecBtn) calcRecBtn.addEventListener("click", () => runRecuperoCalc(true));
+  if(resetRecBtn) resetRecBtn.addEventListener("click", resetRecupero);
+
+  // Rende più comodo: Enter = calcola (dove possibile)
+  [wBundleR, tMeasR, tNomR].filter(Boolean).forEach(el => {
+    el.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") runRecuperoCalc(true);
+    });
+  });
+
+  toggleRecMode();
+
+  // Qty behavior + numeric only
+  setupQtyField(qtyP);
+  setupQtyField(qtyS);
+  if(qtyR) setupQtyField(qtyR);
+  [qtyP, qtyS, qtyR].filter(Boolean).forEach(el => el.addEventListener("input", () => { el.value = el.value.replace(/[^\d]/g, ""); }));
+
+  // Paint UI setup
+  setupPaintUI(paintP, paintBoxP, paintUmBoxP, paintTypeP, paintUmP);
+  setupPaintUI(paintS, paintBoxS, paintUmBoxS, paintTypeS, paintUmS);
+  if(paintR && paintBoxR && paintUmBoxR && paintTypeR && paintUmR){
+    setupPaintUI(paintR, paintBoxR, paintUmBoxR, paintTypeR, paintUmR);
+  }
+
+  // Sync paint thickness when type changes (if not custom)
+  paintTypeP.addEventListener("change", () => {
+    if(paintTypeP.value !== "custom"){
+      const p = paintPreset(paintTypeP.value);
+      if(Number.isFinite(p)) paintUmP.value = String(p).replace(".", ",");
+    }
+    runPesoCalc(false);
+  });
+  paintTypeS.addEventListener("change", () => {
+    if(paintTypeS.value !== "custom"){
+      const p = paintPreset(paintTypeS.value);
+      if(Number.isFinite(p)) paintUmS.value = String(p).replace(".", ",");
+    }
+    runSpessoreCalc(false);
+  });
+
+  // Buttons
+  document.getElementById("calcPesoBtn").addEventListener("click", () => runPesoCalc(true));
+  document.getElementById("resetPesoBtn").addEventListener("click", () => {
+    diamSelP.selectedIndex = 0;
+    tP.value = "2,00";
+    lP.value = "6,000";
+    qtyP.value = "1";
+    galvP.checked = false;
+    paintP.checked = false;
+    paintTypeP.value = "epoxy";
+    paintUmP.value = String(settings.epoxy_um).replace(".", ",");
+    setGroupError(grpTP,false); setGroupError(grpLP,false); setGroupError(grpQtyP,false);
+    setGroupError(grpDiamP,false);
+    runPesoCalc(false);
+  });
+
+  document.getElementById("calcSpBtn").addEventListener("click", () => runSpessoreCalc(true));
+  document.getElementById("resetSpBtn").addEventListener("click", () => {
+    diamSelS.selectedIndex = 0;
+    lS.value = "6,000";
+    qtyS.value = "1";
+    wBundleIn.value = "";
+    galvS.checked = false;
+    paintS.checked = false;
+    paintTypeS.value = "epoxy";
+    paintUmS.value = String(settings.epoxy_um).replace(".", ",");
+    setGroupError(grpLS,false); setGroupError(grpQtyS,false); setGroupError(grpWB,false);
+    setGroupError(grpDiamS,false);
+    outT.textContent = "— mm";
+    outTSub.textContent = "—";
+    outWOneFromInput.textContent = "— kg";
+    outWOneFromInputSub.textContent = "—";
+  });
+
+  // Silent auto-calc (input + change per compatibilità browser)
+  [diamSelP, tP, lP, qtyP, paintTypeP, paintUmP].forEach(el => {
+    el.addEventListener("input", () => runPesoCalc(false));
+    el.addEventListener("change", () => runPesoCalc(false));
+  });
+  [galvP, paintP].forEach(el => {
+    el.addEventListener("change", () => runPesoCalc(false));
+  });
+
+  [diamSelS, lS, qtyS, wBundleIn, paintTypeS, paintUmS].forEach(el => {
+    el.addEventListener("input", () => runSpessoreCalc(false));
+    el.addEventListener("change", () => runSpessoreCalc(false));
+  });
+  [galvS, paintS].forEach(el => {
+    el.addEventListener("change", () => runSpessoreCalc(false));
+  });
+
+  // Initial calc
+  runPesoCalc(false);
+</script>
+</body>
+</html>
