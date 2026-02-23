@@ -1,10 +1,6 @@
 <!doctype html>
 <html lang="it" data-theme="dark">
 <head>
-  <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#111111">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Calcolo peso — Acciaitubi</title>
@@ -66,6 +62,7 @@
     }
 
     *{ box-sizing:border-box; }
+    html, body{ overflow-x: hidden; }
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -90,6 +87,7 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
+      flex-wrap: wrap;
       gap:14px;
       margin-bottom: 14px;
     }
@@ -128,7 +126,52 @@
       justify-content:flex-end;
     }
 
-    .btn{
+    
+    /* --- Mobile: tabs sempre visibili (niente scroll orizzontale) --- */
+    @media (max-width: 720px){
+      .wrap{ padding: 0 12px 28px; margin: 12px auto; }
+
+      /* Topbar: impila e resta visibile mentre scrolli */
+      .topbar{
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        padding: 10px 0;
+        margin-bottom: 10px;
+        background: rgba(0,0,0,.55);
+        background: color-mix(in oklab, var(--bg) 65%, transparent);
+        backdrop-filter: blur(10px);
+      }
+
+      .leftTop{
+        width: 100%;
+        min-width: 0;
+        justify-content: space-between;
+      }
+
+      /* Riduci un filo il titolo */
+      h1{ font-size: 18px; }
+
+      .topActions{
+        width: 100%;
+        justify-content: stretch;
+      }
+
+      .seg3{
+        width: 100%;
+      }
+
+      /* 3 pulsanti sempre dentro lo schermo */
+      .seg3 button{
+        flex: 1 1 0;
+        min-width: 0;
+        text-align: center;
+        white-space: normal;  /* permette "Spessore da peso" su 2 righe */
+        line-height: 1.05;
+        padding: 10px 8px;
+      }
+    }
+.btn{
       border:1px solid var(--line);
       background: color-mix(in oklab, var(--panel) 70%, transparent);
       color: var(--text);
@@ -700,7 +743,14 @@
 
     .modePane{ display:none; }
     .modePane.active{ display:block; }
-  </style>
+  
+    @media (max-width: 380px){
+      .seg3 button{ font-size: 12px; }
+      .btn{ padding: 10px 10px; }
+      .logo{ height: 40px; }
+    }
+
+</style>
 </head>
 
 <body>
@@ -2213,13 +2263,5 @@ qtyS.value = String(qty);
   // Initial calc
   runPesoCalc(false);
 </script>
-  <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js");
-    });
-  }
-</script>
-
 </body>
 </html>
