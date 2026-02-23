@@ -1,17 +1,22 @@
-const CACHE_NAME = "tubi-cache-v1";
+/* Acciaitubi PWA Service Worker - basic offline cache */
+const CACHE_NAME = "tubi-pwa-v1.0.0";
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
+  "./favicon.ico",
+  "./favicon-16.png",
+  "./favicon-32.png",
+  "./favicon-48.png",
   "./icons/icon-192.png",
-  "./icons/icon-512.png"
-  // aggiungi qui eventuali css/js separati o immagini critiche
+  "./icons/icon-192-maskable.png",
+  "./icons/icon-512.png",
+  "./icons/icon-512-maskable.png",
+  "./icons/apple-touch-icon.png"
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
   self.skipWaiting();
 });
 
@@ -26,19 +31,23 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
+
+  // Only handle GET
+  if (req.method !== "GET") return;
+
   event.respondWith(
     caches.match(req).then((cached) => {
-      return (
-        cached ||
-        fetch(req).then((res) => {
-          // Cache dinamica per GET
-          if (req.method === "GET" && res.ok) {
+      if (cached) return cached;
+
+      return fetch(req)
+        .then((res) => {
+          if (res && res.ok) {
             const copy = res.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
           }
           return res;
-        }).catch(() => caches.match("./index.html"))
-      );
+        })
+        .catch(() => caches.match("./index.html"));
     })
   );
 });

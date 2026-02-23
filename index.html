@@ -4,7 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Calcolo peso — Acciaitubi</title>
-  <style>
+    <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f1a">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
     :root{
       --brand:#0059ff;
       --brand2:#2b7bff;
@@ -38,6 +46,11 @@
 
       --ok: rgba(30, 150, 85, .95);
       --okBg: rgba(30, 150, 85, .12);
+
+      /* Scrollbar (theme) */
+      --sbTrack: rgba(255,255,255,.06);
+      --sbThumb: rgba(255,255,255,.18);
+      --sbThumbHover: rgba(255,255,255,.28);
     }
 
     html[data-theme="light"]{
@@ -59,6 +72,11 @@
       --brandGlow: rgba(0,89,255,.16);
 
       --xColor: rgba(13,18,32,.92);
+
+      /* Scrollbar (theme) */
+      --sbTrack: rgba(0,0,0,.06);
+      --sbThumb: rgba(0,0,0,.20);
+      --sbThumbHover: rgba(0,0,0,.30);
     }
 
     *{ box-sizing:border-box; }
@@ -87,7 +105,7 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap:14px;
       margin-bottom: 14px;
     }
@@ -96,7 +114,8 @@
       display:flex;
       align-items:center;
       gap:12px;
-      min-width: 280px;
+      min-width: 0;
+      justify-content:flex-start;
     }
 
     .brandRow{
@@ -144,6 +163,7 @@
         background: color-mix(in oklab, var(--card) 78%, transparent);
         backdrop-filter: blur(10px);
         overflow: hidden;
+        flex-wrap: wrap; /* su mobile va a capo */
       }
 
       /* Layout mobile: logo + titolo centrati, menu in alto a sinistra */
@@ -189,51 +209,17 @@
         margin-top: 10px;
       }
 
-      .seg3{
-        width: 100%;
-      }
+      /* Tabs sempre visibili e senza scroll orizzontale */
+      .seg3{ width: 100%; }
 
-      /* 3 pulsanti sempre dentro lo schermo e centrati */
       .seg3 button{
         flex: 1 1 0;
         min-width: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         text-align: center;
         white-space: normal;
-        line-height: 1.1;
-        padding: 10px 8px;
-        min-height: 44px;
-      }
-    }
-
-      .leftTop{
-        width: 100%;
-        min-width: 0;
-        justify-content: space-between;
-      }
-
-      /* Riduci un filo il titolo */
-      h1{ font-size: 18px; }
-
-      .topActions{
-        width: 100%;
-        justify-content: stretch;
-      }
-
-      .seg3{
-        width: 100%;
-      }
-
-      /* 3 pulsanti sempre dentro lo schermo */
-      .seg3 button{
-        flex: 1 1 0;
-        min-width: 0;
-        text-align: center;
-        white-space: normal;  /* permette "Spessore" su 2 righe */
         line-height: 1.05;
         padding: 10px 8px;
+        min-height: 44px;
       }
     }
 .btn{
@@ -783,7 +769,51 @@
       flex-wrap:wrap;
     }
 
-    table{
+    
+    /* Modal gestione diametri: tabella scrollabile con input sempre in alto */
+    .diamTableWrap{
+      margin-top: 10px;
+      max-height: clamp(220px, 45vh, 420px);
+      overflow-y: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: color-mix(in oklab, var(--panel) 78%, transparent);
+    }
+
+    /* Scrollbar styling (Gestione diametri) */
+    .diamTableWrap{
+      scrollbar-width: thin;
+      scrollbar-color: var(--sbThumb) var(--sbTrack);
+    }
+    .diamTableWrap::-webkit-scrollbar{
+      width: 10px;
+      height: 10px;
+    }
+    .diamTableWrap::-webkit-scrollbar-track{
+      background: var(--sbTrack);
+      border-radius: 999px;
+      margin: 6px;
+    }
+    .diamTableWrap::-webkit-scrollbar-thumb{
+      background: var(--sbThumb);
+      border-radius: 999px;
+      border: 3px solid transparent;
+      background-clip: content-box;
+    }
+    .diamTableWrap::-webkit-scrollbar-thumb:hover{
+      background: var(--sbThumbHover);
+      background-clip: content-box;
+    }
+    .diamTableWrap table{ margin-top: 0; }
+    .diamTableWrap thead th{
+      position: sticky;
+      top: 0;
+      background: color-mix(in oklab, var(--panel) 92%, transparent);
+      backdrop-filter: blur(6px);
+      z-index: 1;
+    }
+
+table{
       width:100%;
       border-collapse: collapse;
       margin-top:10px;
@@ -1202,7 +1232,7 @@
   const LS_DIAM = "acciaitubi_diameters_v3";
   const LS_SETTINGS = "acciaitubi_settings_v3";
   
-  const APP_VERSION = "v1.1";
+  const APP_VERSION = "v1.2";
 const LS_THEME = "acciaitubi_theme_v3";
 
   const DEFAULT_DIAMETERS = [
@@ -2111,6 +2141,8 @@ qtyS.value = String(qty);
 
       <div class="hint" id="m_dStatus">Totale diametri: ${diameters.length}</div>
 
+
+      <div class="diamTableWrap">
       <table>
         <thead>
           <tr>
@@ -2121,6 +2153,7 @@ qtyS.value = String(qty);
         </thead>
         <tbody id="m_dBody">${rows}</tbody>
       </table>
+      </div>
     `;
 
     const actions = `
@@ -2213,6 +2246,8 @@ qtyS.value = String(qty);
         <br><br>
         <b>Crediti</b><br>
         Sviluppato da <b>Marco Gerenzani</b> – Acciaitubi.
+        <br><b>Contatto</b><br>
+        <a href="mailto:marcogerenzani@acciaitubi.it">marcogerenzani@acciaitubi.it</a>
         <br><b>Versione</b><br>
         <span style=\"opacity:.9\">${APP_VERSION}</span>
       </div>
@@ -2328,5 +2363,14 @@ qtyS.value = String(qty);
   // Initial calc
   runPesoCalc(false);
 </script>
+
+  <script>
+    // PWA: register service worker (GitHub Pages friendly paths)
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>
