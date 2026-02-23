@@ -131,17 +131,82 @@
     @media (max-width: 720px){
       .wrap{ padding: 0 12px 28px; margin: 12px auto; }
 
-      /* Topbar: impila e resta visibile mentre scrolli */
+      /* Topbar: card sticky arrotondata (coerente con i riquadri) */
       .topbar{
         position: sticky;
         top: 0;
         z-index: 50;
-        padding: 10px 0;
         margin-bottom: 10px;
-        background: rgba(0,0,0,.55);
-        background: color-mix(in oklab, var(--bg) 65%, transparent);
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(15,21,39,.86);
+        background: color-mix(in oklab, var(--card) 78%, transparent);
         backdrop-filter: blur(10px);
+        overflow: hidden;
       }
+
+      /* Layout mobile: logo + titolo centrati, menu in alto a sinistra */
+      .leftTop{
+        width: 100%;
+        min-width: 0;
+        position: relative;
+        justify-content: center;
+      }
+
+      #menuBtn{
+        position: absolute;
+        left: 0;
+        top: 0;
+        padding: 10px 10px;
+      }
+
+      .brandRow{
+        width: 100%;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        text-align: center;
+        padding-top: 2px;
+      }
+
+      .logo{ height: 42px; }
+
+      /* Titolo pagina (Calcolo peso/spessore/recupero) ben evidente */
+      h1{
+        width: 100%;
+        margin: 0;
+        font-size: 19px;
+        text-align: center;
+        letter-spacing: .25px;
+        text-shadow: 0 10px 22px rgba(0,0,0,.35);
+      }
+
+      .topActions{
+        width: 100%;
+        justify-content: stretch;
+        margin-top: 10px;
+      }
+
+      .seg3{
+        width: 100%;
+      }
+
+      /* 3 pulsanti sempre dentro lo schermo e centrati */
+      .seg3 button{
+        flex: 1 1 0;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        white-space: normal;
+        line-height: 1.1;
+        padding: 10px 8px;
+        min-height: 44px;
+      }
+    }
 
       .leftTop{
         width: 100%;
@@ -166,7 +231,7 @@
         flex: 1 1 0;
         min-width: 0;
         text-align: center;
-        white-space: normal;  /* permette "Spessore da peso" su 2 righe */
+        white-space: normal;  /* permette "Spessore" su 2 righe */
         line-height: 1.05;
         padding: 10px 8px;
       }
@@ -821,7 +886,7 @@
       <div class="topActions">
         <div class="seg3" role="tablist" aria-label="Modalità calcolo">
           <button id="tabPeso" class="active" type="button" data-mode="peso" role="tab">Peso</button>
-          <button id="tabSpessore" type="button" data-mode="spessore" role="tab">Spessore da peso</button>
+          <button id="tabSpessore" type="button" data-mode="spessore" role="tab">Spessore</button>
           <button id="tabRecupero" type="button" data-mode="recupero" role="tab">Recupero</button>
         </div>
       </div>
